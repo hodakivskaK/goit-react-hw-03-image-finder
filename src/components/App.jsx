@@ -1,14 +1,14 @@
 import { Component } from 'react'
-import axios from "axios";
+// import axios from "axios";
 import c from './App.module.css'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { Searchbar } from "./Searchbar";
-import { Loader } from './Loader';
+// import { Loader } from './Loader';
 import {ImageGallery} from './ImageGallery'
 import { Modal } from "./Modal";
-import { keyboard } from '@testing-library/user-event/dist/keyboard';
+// import { keyboard } from '@testing-library/user-event/dist/keyboard';
  
 
 export class App extends Component {
@@ -24,7 +24,7 @@ export class App extends Component {
     this.setState({inputSearch: searchName});
   }
 
-  handleToggle = (e) => {
+  handleToggle = () => {
      this.setState(({ window }) => ({
       window: !window,
      }))
@@ -40,7 +40,7 @@ export class App extends Component {
 
 
   render() {
-      const { inputSearch, window, largeImg, alt, totalHits } = this.state;
+      const { inputSearch, window, largeImg, alt } = this.state;
 
     return (
       <div className={c.App} >
