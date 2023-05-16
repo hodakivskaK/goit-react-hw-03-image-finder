@@ -1,7 +1,7 @@
 import { Component } from 'react'
 // import axios from "axios";
 import c from './App.module.css'
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { Searchbar } from "./Searchbar";
