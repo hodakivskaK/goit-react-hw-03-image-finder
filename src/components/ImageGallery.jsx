@@ -8,7 +8,6 @@ export class ImageGallery extends Component {
     state = {
         page: 1,
         per_page: 12,
-        gallery: [],
         error: null,
         status: "idle",
         imgCollection: [],
@@ -16,36 +15,34 @@ export class ImageGallery extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        let { page } = this.state
-        if (prevProps.inputSearch !== this.props.inputSearch) {
-            this.setState({ status: "pending", gallery: null })
-            fetch(`https://pixabay.com/api/?key=36351524-32f9ea6cfc89d6fe5933a5610&q=${this.props.inputSearch}&image_type=photo&orientation=horizontal&per_page=12&id&webformatURL&largeImageURL`)
-                .then(res => res.json())
-                .then(gallery => { this.setState({ gallery: gallery, status: "resolved", totalHits: gallery.totalHits }) })
+        let { page, imgCollection } = this.state;
+
+        if (prevProps.inputSearch !== this.props.inputSearch || prevState.page !== page) {
+            this.setState({ status: "pending", imgCollection: [] })
+            fetch(`https://pixabay.com/api/?key=36351524-32f9ea6cfc89d6fe5933a5610&q=${this.props.inputSearch}&page=${page}&image_type=photo&orientation=horizontal&per_page=12&id&webformatURL&largeImageURL`)
+                .then(res => res.json() )
+                .then(gallery => { 
+                    this.setState({ status: "resolved", totalHits: gallery.totalHits })
+                    if (prevState.page !== page) {
+                       return  this.setState({ imgCollection: [...imgCollection, ...gallery.hits] })
+                    }
+                    if (prevProps.inputSearch !== this.props.inputSearch) {
+                       return this.setState({ imgCollection: gallery.hits, page:1 })
+                    }
+                   
+                })
                 .catch(error => this.setState({ error, status: "rejected" }))
-            this.setState({ page: 1 })
-        }
-
-        if (prevState.page !== this.state.page) {
-             this.setState({ status: "pending", gallery: null })
-            fetch(`https://pixabay.com/api/?key=36351524-32f9ea6cfc89d6fe5933a5610&q=${this.props.inputSearch}&image_type=photo&orientation=horizontal&per_page=24&id&webformatURL&largeImageURL&page=${page}`)
-                .then(res => res.json())
-                .then(gallery => {this.setState({ gallery: gallery, status: "resolved", totalHits: gallery.totalHits }) })
-                .catch(error => this.setState({ error, status: "rejected" }))
-        
-        }
-
-
+           
+        }      
     }
-     onNextPage = () => {
-   
-        this.setState({ page: this.state.page + 1,  per_page: this.state.page + 12, totalHits: this.state.page - 12 })
     
+     onNextPage = () => {
+        this.setState({ page: this.state.page + 1 })
     };
     
 
     render() {
-        const { gallery ,  error, status, totalHits} = this.state;
+        const { imgCollection ,  error, status, totalHits} = this.state;
             
         if (status === "idle") {
               return (<h1>Start search</h1>)
@@ -63,10 +60,11 @@ export class ImageGallery extends Component {
         return  <div>
         <ul className={c.ImageGallery}>
                 
-                {gallery.hits.map(img =>
-                    <ImageGalleryItem img={img} id={img.id} src={img.webformatURL} alt={img.tags} openImg={this.props.onOpen} />)}
+                {imgCollection.map(img =>
+                    <ImageGalleryItem img={img} key={img.id} src={img.webformatURL} alt={img.tags} openImg={this.props.onOpen} />)}
             </ul>
-            {totalHits >= 12 && <Button onConsole={this.onNextPage} />}
+            {totalHits >= 12 && totalHits > imgCollection.length && <Button onConsole={this.onNextPage} />}
+            {totalHits < 1 && <h1>We don't have any picture</h1> }
                    
             </div>
              
