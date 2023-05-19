@@ -38,14 +38,14 @@ export class App extends Component {
   };
 
 
-
   render() {
       const { inputSearch, window, largeImg, alt } = this.state;
 
     return (
       <div className={c.App} >
         <Searchbar onSubmit={this.handleFormSubmit} />
-        <ImageGallery inputSearch={inputSearch} onOpen={this.handleClick} /> 
+
+        <ImageGallery inputSearch={inputSearch} onOpen={this.handleClick}  /> 
         
         {window && <Modal src={largeImg} discr={alt} onClose={this.handleToggle} />}
         <ToastContainer autoClose={1000} />

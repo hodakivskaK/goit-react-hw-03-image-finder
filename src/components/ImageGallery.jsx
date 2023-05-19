@@ -4,6 +4,8 @@ import { Loader } from './Loader';
 import { ImageGalleryItem } from './ImageGalleryItem'
 import { Button } from './Button';
 
+
+  
 export class ImageGallery extends Component { 
     state = {
         page: 1,
@@ -15,28 +17,36 @@ export class ImageGallery extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        let { page, imgCollection } = this.state;
-
-        if (prevProps.inputSearch !== this.props.inputSearch || prevState.page !== page) {
+         let { imgCollection, page } = this.state;
+       
+        if (prevProps.inputSearch !== this.props.inputSearch || prevState.page < page ) {
             this.setState({ status: "pending", imgCollection: [] })
+
+            if (prevProps.inputSearch !== this.props.inputSearch) {
+                page = 1;
+                this.setState({ page: 1 })
+            }
+
             fetch(`https://pixabay.com/api/?key=36351524-32f9ea6cfc89d6fe5933a5610&q=${this.props.inputSearch}&page=${page}&image_type=photo&orientation=horizontal&per_page=12&id&webformatURL&largeImageURL`)
                 .then(res => res.json() )
-                .then(gallery => { 
+                .then(gallery => {
                     this.setState({ status: "resolved", totalHits: gallery.totalHits })
-                    if (prevState.page !== page) {
-                       return  this.setState({ imgCollection: [...imgCollection, ...gallery.hits] })
-                    }
                     if (prevProps.inputSearch !== this.props.inputSearch) {
-                       return this.setState({ imgCollection: gallery.hits, page:1 })
+                        console.log("INPUT");
+                        return this.setState({ imgCollection: gallery.hits, })
                     }
-                   
+                    if(prevState.page <= page){
+                        console.log("PAGE")
+                        return this.setState({ imgCollection: [...imgCollection, ...gallery.hits] })
+                    }
                 })
                 .catch(error => this.setState({ error, status: "rejected" }))
+            return;
            
         }      
     }
     
-     onNextPage = () => {
+    onNextPage = () => {
         this.setState({ page: this.state.page + 1 })
     };
     
